@@ -5,6 +5,7 @@ import android.app.Activity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -86,6 +87,7 @@ class MainActivity : ComponentActivity() {
                     watchList.addAll(stockList.filter { it-> it.stock.own!=true })
                     ownedStocksAdapter.updateStockList(ownedStock)
                     watchlistAdapter.updateStockList(watchList)
+                    Toast.makeText(this@MainActivity,"Values Refreshed" as CharSequence, Toast.LENGTH_SHORT).show()
                 }, { error ->
                     Log.e("API_ERROR", "Error fetching stocks: ${error.message}")
                 })

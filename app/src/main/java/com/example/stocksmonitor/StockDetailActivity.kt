@@ -1,6 +1,5 @@
 package com.example.stocksmonitor
 
-import android.app.Activity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -13,6 +12,10 @@ import android.widget.ProgressBar
 import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.stocksmonitor.model.InfoDTO
 import com.example.stocksmonitor.model.Stock
 import com.example.stocksmonitor.service.RetrofitClient
 import retrofit2.Call
@@ -21,13 +24,17 @@ import retrofit2.Response
 import java.math.BigDecimal
 import java.util.Locale
 
-class StockDetailActivity : Activity() {
+class StockDetailActivity : ComponentActivity() {
+
+    private lateinit var alertsView: RecyclerView
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_stock_detail)
         val bundle = intent.getBundleExtra("stock")
         val stockSymbolTextView = findViewById<TextView>(R.id.stockSymbol)
-        stockSymbolTextView.text=bundle?.getString("stockSymbol")
+        stockSymbolTextView.text = bundle?.getString("stockSymbol")
         val currentPriceValueTextView = findViewById<TextView>(R.id.currentPriceValue)
         currentPriceValueTextView.text = bundle?.getString("currentPrice")
         val targetPriceValueTextView = findViewById<TextView>(R.id.targetPriceValue)
@@ -56,16 +63,23 @@ class StockDetailActivity : Activity() {
             targetPriceValueTextView.text = String.format(Locale.ENGLISH,"%.2f",targetPriceTemp)
         }
 
-        val activeSwitchView = findViewById<Switch>(R.id.active)
+        val activeSwitchView = findViewById<Switch>(R.id.alarmActive)
         activeSwitchView.isChecked = bundle?.getBoolean("active")?:false
 
         val ownSwitchView = findViewById<Switch>(R.id.own)
         ownSwitchView.isChecked = bundle?.getBoolean("own")?:false
 
 
+        alertsView=findViewById(R.id.alarmlist)
+        alertsView.layoutManager = LinearLayoutManager(this)
+        setAdapter(bundle?.getString("stockSymbol").toString())
+
         val saveButton = findViewById<Button>(R.id.save)
         saveButton.setOnClickListener ( object : OnClickListener{
             override fun onClick(v: View?) {
+                val progressBar = findViewById<ProgressBar>(R.id.updateLoading)
+                progressBar.visibility = View.VISIBLE
+                val lastSoldPrice = soldPriceValueTextView.text?.toString()?.toBigDecimal()
 
                 val targetPrice = targetPriceValueTextView.text?.toString()?.toBigDecimal()
                 val currentPrice = currentPriceValueTextView.text?.toString()?.toBigDecimal()
@@ -74,11 +88,13 @@ class StockDetailActivity : Activity() {
                 val stockSymbol = stockSymbolTextView.text.toString()
                 val active = activeSwitchView.isChecked
                 val own = ownSwitchView.isChecked
-                val stock = Stock(stockSymbol,null,null,null,currentPrice,targetPrice,own,active,boughtPriceInner,targetPrice,units)
+                val stock = Stock(stockSymbol,null,null,null,currentPrice,targetPrice,own,active,boughtPriceInner,lastSoldPrice,units)
                 try{
                     val call = RetrofitClient.apiService.saveStock(stock)
                     call.enqueue(object : Callback<Stock>{
                         override fun onResponse(call: Call<Stock>, response: Response<Stock>) {
+                            progressBar.visibility = View.GONE
+                            Toast.makeText(this@StockDetailActivity,"Settings Saved" as CharSequence,Toast.LENGTH_SHORT).show()
                             println(response.body())
                         }
 
@@ -95,6 +111,31 @@ class StockDetailActivity : Activity() {
 
             }
         })
+
+    }
+
+    private fun setAdapter(stockSymbol:String) {
+        try{
+            val call = RetrofitClient.apiService.getStock(stockSymbol)
+            call.enqueue(object : Callback<InfoDTO>{
+                override fun onResponse(call: Call<InfoDTO>, response: Response<InfoDTO>) {
+                    val infodto = response.body()
+                    val alarmAdapter = infodto?.let { AlarmAdapter(it.alerts,this@StockDetailActivity) }
+                    alertsView.adapter = alarmAdapter
+
+                }
+
+                override fun onFailure(call: Call<InfoDTO>, t: Throwable) {
+                    TODO("Not yet implemented")
+                }
+
+            })
+
+
+        }catch (e:Exception){
+            Log.e("StockDetailActivity", "Error fetching stocks: ${e.message}")
+        }
+
     }
 
 

@@ -6,7 +6,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 
 object RetrofitClient {
-    private const val BASE_URL = "https://q9p3fnlyem2j.share.zrok.io"
+    private const val BASE_URL = "https://msem4lzhpcye.share.zrok.io"
 
     val apiService: StockService by lazy {
         Retrofit.Builder()
