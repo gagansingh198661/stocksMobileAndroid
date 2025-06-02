@@ -1,14 +1,17 @@
 package com.example.stocksmonitor.activity
 
 import android.annotation.SuppressLint
+import android.app.NotificationManager
+import android.content.Context
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.core.app.NotificationCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.stocksmonitor.R
 import com.example.stocksmonitor.adapters.StockAdapter
 import com.example.stocksmonitor.model.InfoDTO
 import com.example.stocksmonitor.service.RetrofitClient
@@ -21,6 +24,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import com.example.stocksmonitor.R
+import com.example.stocksmonitor.model.AlertDTO
 
 
 class MainActivity : ComponentActivity() {
@@ -86,6 +91,18 @@ class MainActivity : ComponentActivity() {
                     watchList.addAll(stockList.filter { it-> it.stock.own!=true })
                     ownedStocksAdapter.updateStockList(ownedStock)
                     watchlistAdapter.updateStockList(watchList)
+                    if(stockList!=null&& stockList.isNotEmpty()){}
+                    stockList.forEach { it ->
+                            if(!it.alerts.isNullOrEmpty()){
+                                it.alerts.forEach { it1 ->
+                                    it1.let { if(it1.alertDTO!=null&&it1.alertDTO.action!=null&&it1.alertDTO.action=="SELL"){
+                                        showNotification(this@MainActivity,it1.alertDTO)
+
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     Toast.makeText(this@MainActivity,"Values Refreshed" as CharSequence, Toast.LENGTH_SHORT).show()
                 }, { error ->
                     Log.e("API_ERROR", "Error fetching stocks: ${error.message}")
@@ -96,6 +113,21 @@ class MainActivity : ComponentActivity() {
             Log.e("MainActivity",e.stackTraceToString())
         }
 
+    }
+
+    fun showNotification(context: Context, alertDTO: AlertDTO) {
+        val channelId = "your_channel_id"  // Not needed for API 23, but useful for consistency
+        val soundUri: Uri = Uri.parse("android.resource://${context.packageName}/${com.example.stocksmonitor.R.raw.bell_notification}")
+
+        val builder = NotificationCompat.Builder(context)
+            .setSmallIcon(com.example.stocksmonitor.R.drawable.ic_launcher_foreground)
+            .setContentTitle("New Alert!")
+            .setContentText("Stock ${alertDTO.message}")
+            .setSound(soundUri)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(1, builder.build())
     }
 
 

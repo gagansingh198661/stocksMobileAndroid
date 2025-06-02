@@ -46,22 +46,22 @@ class StockDetailActivity : ComponentActivity() {
 
         targetPriceValueTextView.text = bundle?.getString("targetPrice")
         Log.d("StockDetailsActivity","value : "+bundle?.getString("targetPrice"))
-        val soldPriceValueTextView = findViewById<TextView>(R.id.soldPriceValue)
-        soldPriceValueTextView.text = bundle?.getString("lastSoldPrice")
-        val unitsValueEditView = findViewById<EditText>(R.id.unitsValue)
+        val soldPriceValueEditText = findViewById<EditText>(R.id.soldPriceValueSD)
+        soldPriceValueEditText.setText(bundle?.getString("lastSoldPrice"))
+        val unitsValueEditView = findViewById<EditText>(R.id.unitsValueSD)
         val unitsValue = bundle?.getInt("units")
         Log.d("StockDetailActivity", "onCreate: "+bundle?.getInt("units").toString())
         unitsValueEditView.setText(unitsValue.toString())
 
-        val requiredProfitValueTextView = findViewById<EditText>(R.id.requiredProfitValue)
+        val requiredProfitValueTextView = findViewById<EditText>(R.id.requiredProfitValueSD)
 
-        val boughtPriceValueTextView = findViewById<TextView>(R.id.boughtPriceValue)
+        val boughtPriceValueEditText = findViewById<EditText>(R.id.boughtPriceValueSD)
         val boughtPrice : Float =  0F
         if(bundle?.getString("boughtPrice")!=null){
-            boughtPriceValueTextView.text = boughtPrice.toString()
+            boughtPriceValueEditText.setText(boughtPrice.toString())
         }
         if (unitsValue != null) {
-            addListener(requiredProfitValueTextView,targetPriceValueTextView,unitsValue,boughtPrice)
+            addListener(boughtPrice,soldPriceValueEditText,requiredProfitValueTextView,targetPriceValueTextView,unitsValue)
         }
         if(bundle?.getString("targetPrice")==null){
             val requiredProfitValue = requiredProfitValueTextView.text.toString().toFloat()
@@ -86,11 +86,11 @@ class StockDetailActivity : ComponentActivity() {
             override fun onClick(v: View?) {
                 val progressBar = findViewById<ProgressBar>(R.id.updateLoading)
                 progressBar.visibility = View.VISIBLE
-                val lastSoldPrice = soldPriceValueTextView.text?.toString()?.toBigDecimal()
+                val lastSoldPrice = soldPriceValueEditText.text?.toString()?.toBigDecimal()
 
                 val targetPrice = targetPriceValueTextView.text?.toString()?.toBigDecimal()
                 val currentPrice = currentPriceValueTextView.text?.toString()?.toBigDecimal()
-                val boughtPriceInner = boughtPriceValueTextView.text?.toString()?.toBigDecimal()?: BigDecimal(0)
+                val boughtPriceInner = boughtPriceValueEditText.text?.toString()?.toBigDecimal()?: BigDecimal(0)
                 val units = unitsValueEditView.text?.toString()?.toInt()?:0
                 val stockSymbol = stockSymbolTextView.text.toString()
                 val active = activeSwitchView.isChecked
@@ -127,6 +127,21 @@ class StockDetailActivity : ComponentActivity() {
             it?.context?.startActivity(intentNew)
         }
 
+        soldPriceValueEditText.addTextChangedListener(object : TextWatcher{
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                TODO("Not yet implemented")
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                TODO("Not yet implemented")
+            }
+        })
+
+
     }
 
     private fun setAdapter(stockSymbol:String) {
@@ -135,7 +150,7 @@ class StockDetailActivity : ComponentActivity() {
             call.enqueue(object : Callback<InfoDTO>{
                 override fun onResponse(call: Call<InfoDTO>, response: Response<InfoDTO>) {
                     val infodto = response.body()
-                    val alarmAdapter = infodto?.let { AlarmAdapter(it.alerts,this@StockDetailActivity) }
+                    val alarmAdapter = infodto?.let { it.alerts?.let { it1 -> AlarmAdapter(it1,this@StockDetailActivity) } }
                     alertsView.adapter = alarmAdapter
 
                 }
@@ -154,7 +169,7 @@ class StockDetailActivity : ComponentActivity() {
     }
 
 
-    fun addListener(requiredProfitView:EditText,targetPrice : TextView,unitsValue : Int,boughtPrice : Float){
+    fun addListener(boughtPrice : Float,soldPriceValueEditText:EditText,requiredProfitView:EditText,targetPrice : TextView,unitsValue : Int){
         requiredProfitView.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable) {
                 try {
@@ -163,7 +178,7 @@ class StockDetailActivity : ComponentActivity() {
                     Log.d("StockDetailActivity", "afterTextChanged: "+targetPriceValue)
                     targetPrice.text = String.format("%.2f",targetPriceValue)
                 }catch (e:NumberFormatException){
-                    targetPrice.text = "00"
+                    targetPrice.text = "0.0"
                     Log.e("StockDetailActivity", "afterTextChanged: "+e )
 
                 }
@@ -177,6 +192,8 @@ class StockDetailActivity : ComponentActivity() {
 
             }
         })
+
+
     }
 
     fun calculateTargetPrice(units:Int, boughtPrice:Float,profitRequired:Float):Float{

@@ -103,12 +103,13 @@
                     android:textAlignment="viewStart"
                     android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/boughtPriceValue"
+                <EditText
+                    android:id="@+id/boughtPriceValueSD"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
-                    android:text="20"
+                    android:text="0.00"
+                    android:inputType="numberDecimal"
                     android:textAlignment="center"
                     android:textSize="18sp" />
             </LinearLayout>
@@ -128,12 +129,13 @@
                     android:textAlignment="viewStart"
                     android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/soldPriceValue"
+                <EditText
+                    android:id="@+id/soldPriceValueSD"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
                     android:text="20"
+                    android:inputType="numberDecimal"
                     android:textAlignment="center"
                     android:textSize="18sp" />
             </LinearLayout>
@@ -154,11 +156,11 @@
                     android:textStyle="bold" />
 
                 <EditText
-                    android:id="@+id/requiredProfitValue"
+                    android:id="@+id/requiredProfitValueSD"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
-                    android:inputType="none"
+                    android:inputType="numberDecimal"
                     android:text="50"
                     android:textAlignment="center" />
             </LinearLayout>
@@ -179,7 +181,7 @@
                     android:textStyle="bold" />
 
                 <EditText
-                    android:id="@+id/unitsValue"
+                    android:id="@+id/unitsValueSD"
                     android:layout_width="61dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
