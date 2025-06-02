@@ -1,16 +1,15 @@
-package com.example.stocksmonitor
+package com.example.stocksmonitor.activity
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.stocksmonitor.R
+import com.example.stocksmonitor.adapters.StockAdapter
 import com.example.stocksmonitor.model.InfoDTO
 import com.example.stocksmonitor.service.RetrofitClient
 import io.reactivex.android.schedulers.AndroidSchedulers

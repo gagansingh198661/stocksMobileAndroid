@@ -1,4 +1,4 @@
-package com.example.stocksmonitor
+package com.example.stocksmonitor.adapters
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -10,6 +10,7 @@ import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import com.example.stocksmonitor.R
 import com.example.stocksmonitor.model.Alert
 
 import com.example.stocksmonitor.service.RetrofitClient

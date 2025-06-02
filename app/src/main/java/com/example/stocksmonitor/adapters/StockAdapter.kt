@@ -1,4 +1,4 @@
-package com.example.stocksmonitor
+package com.example.stocksmonitor.adapters
 
 import android.content.Context
 import android.content.Intent
@@ -9,6 +9,8 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.stocksmonitor.R
+import com.example.stocksmonitor.activity.StockDetailActivity
 import com.example.stocksmonitor.model.InfoDTO
 
 class StockAdapter(private val infoDTOList: MutableList<InfoDTO>,private val context: Context):RecyclerView.Adapter<StockAdapter.StockViewHolder>() ,
@@ -17,7 +19,7 @@ class StockAdapter(private val infoDTOList: MutableList<InfoDTO>,private val con
 
     class StockViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val stockSymbol: TextView = itemView.findViewById(R.id.stockSymbol)
-        val currentPrice: TextView = itemView.findViewById(R.id.currentPrice)
+        val currentPrice: TextView = itemView.findViewById(R.id.currentPriceCreateAlert)
         val lastSoldPrice: TextView = itemView.findViewById(R.id.lastSoldPrice)
         val targetPrice:TextView = itemView.findViewById(R.id.targetPrice)
 
@@ -37,14 +39,14 @@ class StockAdapter(private val infoDTOList: MutableList<InfoDTO>,private val con
         holder.itemView.setOnClickListener(View.OnClickListener {
             val pos = holder.bindingAdapterPosition
             val infoDTOInner = infoDTOList[pos]
-            val intent  = Intent(context,StockDetailActivity::class.java)
+            val intent  = Intent(context, StockDetailActivity::class.java)
             val  bundle =  Bundle()
             bundle.putString("lastSoldPrice",infoDTOInner.stock.lastSoldPrice?.toPlainString())
             bundle.putString("stockSymbol",infoDTOInner.stock.stockSymbol)
             bundle.putString("currentPrice",infoDTOInner.stock.currentPrice.toString())
             bundle.putString("targetPrice",infoDTOInner.stock.targetPrice?.toPlainString())
             bundle.putInt("units",infoDTOInner.stock.units)
-            bundle.putString("boughtPrice",infoDTOInner.stock.boughtPrice.toString())
+            infoDTOInner.stock.boughtPrice?.let{bundle.putString("boughtPrice",infoDTOInner.stock.boughtPrice.toString())}
             bundle.putBoolean("own",infoDTOInner.stock.own)
             bundle.putBoolean("active",infoDTOInner.stock.active)
             intent.putExtra("stock",bundle)

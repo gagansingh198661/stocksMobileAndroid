@@ -1,5 +1,6 @@
-package com.example.stocksmonitor
+package com.example.stocksmonitor.activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -8,6 +9,7 @@ import android.view.View
 import android.view.View.OnClickListener
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.Switch
 import android.widget.TextView
@@ -15,6 +17,8 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.stocksmonitor.adapters.AlarmAdapter
+import com.example.stocksmonitor.R
 import com.example.stocksmonitor.model.InfoDTO
 import com.example.stocksmonitor.model.Stock
 import com.example.stocksmonitor.service.RetrofitClient
@@ -27,7 +31,7 @@ import java.util.Locale
 class StockDetailActivity : ComponentActivity() {
 
     private lateinit var alertsView: RecyclerView
-
+    private lateinit var stockSymbolString: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +39,7 @@ class StockDetailActivity : ComponentActivity() {
         val bundle = intent.getBundleExtra("stock")
         val stockSymbolTextView = findViewById<TextView>(R.id.stockSymbol)
         stockSymbolTextView.text = bundle?.getString("stockSymbol")
+        stockSymbolString = bundle?.getString("stockSymbol").toString()
         val currentPriceValueTextView = findViewById<TextView>(R.id.currentPriceValue)
         currentPriceValueTextView.text = bundle?.getString("currentPrice")
         val targetPriceValueTextView = findViewById<TextView>(R.id.targetPriceValue)
@@ -51,8 +56,10 @@ class StockDetailActivity : ComponentActivity() {
         val requiredProfitValueTextView = findViewById<EditText>(R.id.requiredProfitValue)
 
         val boughtPriceValueTextView = findViewById<TextView>(R.id.boughtPriceValue)
-        val boughtPrice : Float = bundle?.getString("boughtPrice")?.toFloat() ?: 0F
-        boughtPriceValueTextView.text = boughtPrice.toString()
+        val boughtPrice : Float =  0F
+        if(bundle?.getString("boughtPrice")!=null){
+            boughtPriceValueTextView.text = boughtPrice.toString()
+        }
         if (unitsValue != null) {
             addListener(requiredProfitValueTextView,targetPriceValueTextView,unitsValue,boughtPrice)
         }
@@ -108,9 +115,17 @@ class StockDetailActivity : ComponentActivity() {
                 }catch (e:Exception){
                     Log.e("StockDetailActivity", "Error fetching stocks: ${e.message}")
                 }
-
             }
         })
+
+        val createAlert = findViewById<ImageButton>(R.id.createAlertStockDetail)
+        createAlert.setOnClickListener { it ->
+
+
+            val intentNew  = Intent(this@StockDetailActivity, CreateAlertActivity::class.java)
+            intentNew.putExtra("stockSymbol",stockSymbolString)
+            it?.context?.startActivity(intentNew)
+        }
 
     }
 
@@ -165,6 +180,9 @@ class StockDetailActivity : ComponentActivity() {
     }
 
     fun calculateTargetPrice(units:Int, boughtPrice:Float,profitRequired:Float):Float{
+        if (boughtPrice.equals(0f)){
+            return 0f
+        }
         val totalCost :Float = boughtPrice*units + 5 + profitRequired
         val targetPrice:Float = totalCost/units;
         return targetPrice
