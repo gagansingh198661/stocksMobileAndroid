@@ -39,8 +39,25 @@ class CreateAlertActivity : ComponentActivity() {
         getStockDetails()
         addListenerToCreateButton()
         addListenerToCancelButton()
-
+        addListenerToUnitsView()
     }
+
+    private fun addListenerToUnitsView() {
+        val unitsCA =findViewById<EditText>(R.id.unitsCA)
+        unitsCA.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                updatedCalculateProfit()
+            }
+
+        })
+    }
+
 
     private fun addListenerToCancelButton() {
         val createAlertButton = findViewById<Button>(R.id.cancelButtonCA)
@@ -97,18 +114,22 @@ class CreateAlertActivity : ComponentActivity() {
                         val targetValue = findViewById<TextView>(R.id.currentPriceCreateAlert).text.toString().toFloat()
                         calculatedValue = getCalculatedTarget(percentageValue, targetValue)
                         targetPriceCA.setText(String.format(Locale.ENGLISH,"%.2f",calculatedValue))
+                        updatedCalculateProfit()
                     }else if(i==1){
                         val targetValue = findViewById<TextView>(R.id.soldPriceCA).text.toString().toFloat()
                         calculatedValue = getCalculatedTarget(percentageValue, targetValue)
                         targetPriceCA.setText(String.format(Locale.ENGLISH,"%.2f",calculatedValue))
+                        updatedCalculateProfit()
                     }else if(i==2) {
                         val targetValue = findViewById<TextView>(R.id.boughtPriceCA).text.toString().toFloat()
                         calculatedValue = getCalculatedTarget(percentageValue, targetValue)
                         targetPriceCA.setText(String.format(Locale.ENGLISH,"%.2f",calculatedValue))
+                        updatedCalculateProfit()
                     }else if(i==3) {
                         val targetValue = findViewById<TextView>(R.id.highestPriceCA).text.toString().toFloat()
                         calculatedValue = getCalculatedTarget(percentageValue, targetValue)
                         targetPriceCA.setText(String.format(Locale.ENGLISH,"%.2f",calculatedValue))
+                        updatedCalculateProfit()
                     }
 
                 }catch(e : Exception){
@@ -144,7 +165,7 @@ class CreateAlertActivity : ComponentActivity() {
                     val soldPriceView = findViewById<TextView>(R.id.soldPriceCA)
                     if(stock!=null){
                         if(stock.lastSoldPrice==null){
-                            soldPriceView.text = java.lang.String("00")
+                            soldPriceView.text = java.lang.String("0.00")
                         }else{
                             soldPriceView.text = stock.lastSoldPrice.toString()
                         }
@@ -152,7 +173,7 @@ class CreateAlertActivity : ComponentActivity() {
                     val boughtPriceView = findViewById<TextView>(R.id.boughtPriceCA)
                     if(stock!=null){
                         if(stock.lastSoldPrice==null){
-                            boughtPriceView.text = java.lang.String("00")
+                            boughtPriceView.text = java.lang.String("0.00")
                         }else{
                             boughtPriceView.text = stock.boughtPrice.toString()
                         }
@@ -185,12 +206,15 @@ class CreateAlertActivity : ComponentActivity() {
             }
 
             override fun afterTextChanged(s: Editable?) {
-                val targetPriceValue = s.toString().toFloat()
+                try {
 
-                if(!targetPriceCA.text.toString().equals("0.00")){
-                    createAlertButton.isEnabled=true
-                }else{
-                    createAlertButton.isEnabled=false
+                    if (!targetPriceCA.text.toString().equals("0.00")) {
+                        createAlertButton.isEnabled = true
+                    } else {
+                        createAlertButton.isEnabled = false
+                    }
+                }catch(ex:Exception){
+                    Log.e("CreateAlertActivity : ",ex.toString())
                 }
             }
         })
@@ -198,7 +222,6 @@ class CreateAlertActivity : ComponentActivity() {
 
     fun addListenerForPercentageText(percentageView: EditText,percentageType : Spinner){
         val targetPriceCA = findViewById<EditText>(R.id.targetPriceCA)
-        val createAlertButton = findViewById<Button>(R.id.createAlertButtonCA)
         percentageView.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable) {
                 try {
@@ -209,15 +232,19 @@ class CreateAlertActivity : ComponentActivity() {
                     if(selectedPercentageTypeValue.equals("current",true)){
                         calculatedValue = getCalculatedTarget(percentageValue, targetValue)
                         targetPriceCA.setText(String.format(Locale.ENGLISH,"%.2f",calculatedValue))
+                        updatedCalculateProfit()
                     }else if(selectedPercentageTypeValue.equals("sold",true)){
                         calculatedValue = getCalculatedTarget(percentageValue, targetValue)
                         targetPriceCA.setText(String.format(Locale.ENGLISH,"%.2f",calculatedValue))
+                        updatedCalculateProfit()
                     }else if(selectedPercentageTypeValue.equals("bought",true)) {
                         calculatedValue = getCalculatedTarget(percentageValue, targetValue)
                         targetPriceCA.setText(String.format(Locale.ENGLISH,"%.2f",calculatedValue))
+                        updatedCalculateProfit()
                     }else if(selectedPercentageTypeValue.equals("highest",true)) {
                         calculatedValue = getCalculatedTarget(percentageValue, targetValue)
                         targetPriceCA.setText(String.format(Locale.ENGLISH,"%.2f",calculatedValue))
+                        updatedCalculateProfit()
                     }
 
 
@@ -248,8 +275,21 @@ class CreateAlertActivity : ComponentActivity() {
             return 0f
         }
         var result : Float = 0f
-        result =  (percentage/100) * targetValue
-        return result+targetValue
+        result =  (percentage/100) * targetValue + targetValue
+        return result
+    }
+
+    fun updatedCalculateProfit(){
+        try {
+            val calculatedPrice = findViewById<EditText>(R.id.targetPriceCA).text.toString().toFloat()
+            val currentPriceView = findViewById<TextView>(R.id.currentPriceCreateAlert)
+            val currentPrice = currentPriceView.text.toString().toFloat()
+            val units = findViewById<EditText>(R.id.unitsCA).text.toString().toInt()
+            val total = calculatedPrice * units - (currentPrice * units)
+            findViewById<TextView>(R.id.profitsCA).text = (total).toString()
+        }catch(e:Exception){
+            Log.e("Please Ignore",e.message.toString())
+        }
     }
 
 

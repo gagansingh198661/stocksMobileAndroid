@@ -42,33 +42,23 @@ class StockDetailActivity : ComponentActivity() {
         stockSymbolString = bundle?.getString("stockSymbol").toString()
         val currentPriceValueTextView = findViewById<TextView>(R.id.currentPriceValue)
         currentPriceValueTextView.text = bundle?.getString("currentPrice")
-        val targetPriceValueTextView = findViewById<TextView>(R.id.targetPriceValue)
 
-        targetPriceValueTextView.text = bundle?.getString("targetPrice")
         Log.d("StockDetailsActivity","value : "+bundle?.getString("targetPrice"))
         val soldPriceValueEditText = findViewById<EditText>(R.id.soldPriceValueSD)
-        soldPriceValueEditText.setText(bundle?.getString("lastSoldPrice"))
+        bundle?.getString("lastSoldPrice")?.let { soldPriceValueEditText.setText(it.toString()) }
+
         val unitsValueEditView = findViewById<EditText>(R.id.unitsValueSD)
         val unitsValue = bundle?.getInt("units")
         Log.d("StockDetailActivity", "onCreate: "+bundle?.getInt("units").toString())
         unitsValueEditView.setText(unitsValue.toString())
 
-        val requiredProfitValueTextView = findViewById<EditText>(R.id.requiredProfitValueSD)
 
         val boughtPriceValueEditText = findViewById<EditText>(R.id.boughtPriceValueSD)
-        val boughtPrice : Float =  0F
+        var boughtPrice : Float =  0F
         if(bundle?.getString("boughtPrice")!=null){
-            boughtPriceValueEditText.setText(boughtPrice.toString())
+            boughtPrice = bundle.getString("boughtPrice").toString().toFloat()
         }
-        if (unitsValue != null) {
-            addListener(boughtPrice,soldPriceValueEditText,requiredProfitValueTextView,targetPriceValueTextView,unitsValue)
-        }
-        if(bundle?.getString("targetPrice")==null){
-            val requiredProfitValue = requiredProfitValueTextView.text.toString().toFloat()
-            val targetPriceTemp =
-                unitsValue?.let { calculateTargetPrice(it,boughtPrice,requiredProfitValue) }
-            targetPriceValueTextView.text = String.format(Locale.ENGLISH,"%.2f",targetPriceTemp)
-        }
+        boughtPriceValueEditText.setText(boughtPrice.toString())
 
         val activeSwitchView = findViewById<Switch>(R.id.alarmActive)
         activeSwitchView.isChecked = bundle?.getBoolean("active")?:false
@@ -88,25 +78,23 @@ class StockDetailActivity : ComponentActivity() {
                 progressBar.visibility = View.VISIBLE
                 val lastSoldPrice = soldPriceValueEditText.text?.toString()?.toBigDecimal()
 
-                val targetPrice = targetPriceValueTextView.text?.toString()?.toBigDecimal()
                 val currentPrice = currentPriceValueTextView.text?.toString()?.toBigDecimal()
                 val boughtPriceInner = boughtPriceValueEditText.text?.toString()?.toBigDecimal()?: BigDecimal(0)
                 val units = unitsValueEditView.text?.toString()?.toInt()?:0
                 val stockSymbol = stockSymbolTextView.text.toString()
                 val active = activeSwitchView.isChecked
                 val own = ownSwitchView.isChecked
-                val stock = Stock(stockSymbol,null,null,null,currentPrice,targetPrice,own,active,boughtPriceInner,lastSoldPrice,units)
+                val stock = Stock(stockSymbol,null,null,null,currentPrice,null,own,active,boughtPriceInner,lastSoldPrice,units)
                 try{
                     val call = RetrofitClient.apiService.saveStock(stock)
                     call.enqueue(object : Callback<Stock>{
                         override fun onResponse(call: Call<Stock>, response: Response<Stock>) {
                             progressBar.visibility = View.GONE
-                            Toast.makeText(this@StockDetailActivity,"Settings Saved" as CharSequence,Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@StockDetailActivity,"Details Saved" as CharSequence,Toast.LENGTH_SHORT).show()
                             println(response.body())
                         }
 
                         override fun onFailure(call: Call<Stock>, t: Throwable) {
-                            TODO("Not yet implemented")
                         }
 
                     })
@@ -127,19 +115,7 @@ class StockDetailActivity : ComponentActivity() {
             it?.context?.startActivity(intentNew)
         }
 
-        soldPriceValueEditText.addTextChangedListener(object : TextWatcher{
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
 
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                TODO("Not yet implemented")
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-                TODO("Not yet implemented")
-            }
-        })
 
 
     }

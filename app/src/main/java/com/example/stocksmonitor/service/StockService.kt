@@ -29,4 +29,7 @@ interface StockService {
 
     @DELETE("/alert/{id}")
     fun deleteAlert(@Path("id") id: Long): Call<Boolean>
+
+    @PATCH("/alert/{id}/{state}")
+    fun toggleAlert(@Path("id") id: Long,@Path("state") state:Boolean): Call<Boolean>
 }
