@@ -21,7 +21,6 @@ class StockAdapter(private val infoDTOList: MutableList<InfoDTO>,private val con
         val stockSymbol: TextView = itemView.findViewById(R.id.stockSymbol)
         val currentPrice: TextView = itemView.findViewById(R.id.currentPriceCreateAlert)
         val lastSoldPrice: TextView = itemView.findViewById(R.id.lastSoldPrice)
-        val targetPrice:TextView = itemView.findViewById(R.id.targetPrice)
 
     }
 
@@ -35,7 +34,6 @@ class StockAdapter(private val infoDTOList: MutableList<InfoDTO>,private val con
         holder.lastSoldPrice.text = infoDTO.stock.lastSoldPrice?.toPlainString()
         holder.stockSymbol.text = infoDTO.stock.stockSymbol
         holder.currentPrice.text = infoDTO.stock.currentPrice?.toPlainString()
-        holder.targetPrice.text = infoDTO.stock.targetPrice?.toPlainString()
         holder.itemView.setOnClickListener(View.OnClickListener {
             val pos = holder.bindingAdapterPosition
             val infoDTOInner = infoDTOList[pos]

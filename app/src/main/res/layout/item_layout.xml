@@ -62,16 +62,6 @@
 
                     />
 
-                <TextView
-                    android:id="@+id/targetPriceLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    android:text="Target Price      : "
-                    android:layout_gravity="left"
-                    android:gravity="left"
-
-                    />
             </LinearLayout>
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -95,13 +85,6 @@
                     android:textSize="14sp"
                     android:layout_gravity="right"
                     android:gravity="right"/>
-
-                <TextView
-                    android:id="@+id/targetPrice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    android:layout_gravity="right"/>
 
             </LinearLayout>
         </LinearLayout>

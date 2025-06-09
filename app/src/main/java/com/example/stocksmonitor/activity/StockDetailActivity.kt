@@ -120,6 +120,11 @@ class StockDetailActivity : ComponentActivity() {
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        setAdapter(stockSymbolString)
+    }
+
     private fun setAdapter(stockSymbol:String) {
         try{
             val call = RetrofitClient.apiService.getStock(stockSymbol)

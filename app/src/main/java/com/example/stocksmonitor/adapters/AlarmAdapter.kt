@@ -104,6 +104,5 @@ class AlarmAdapter(private val alertList: MutableList<Alert>, private val contex
     }
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        TODO("Not yet implemented")
     }
 }
